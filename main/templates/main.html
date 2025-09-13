@@ -1,6 +1,45 @@
+ {% extends 'base.html' %}
+ {% block content %}
+
 <h1>{{ app_name }}</h1>
 
 <h5>Name: </h5>
 <p>{{ name }}<p>
 <h5>Class: </h5>
 <p>{{ class }}</p>
+
+<a href="{% url 'main:add_item' %}">
+  <button>+ Add an Item</button>
+</a>
+
+<hr>
+
+{% if not items %}
+<p>Belum ada data barang.</p>
+{% else %}
+
+{% for item in items %}
+<div>
+  <h2><a href="{% url 'main:show_items' item.id %}">{{ item.name }}</a></h2>
+
+  <p>
+    <b>{{ item.get_category_display }}</b>
+    {% if item.is_featured %} | 
+    <b>Featured</b>{% endif %}
+    | Stock: {{ item.stock }}</p>
+
+  {% if item.thumbnail %}
+  <img src="{{ item.thumbnail }}" alt="{{ item.name }} thumbnail" width="150" height="100">
+  <br />
+  {% endif %}
+
+  <p>{{ item.description|truncatewords:25 }}...</p>
+
+  <p><a href="{% url 'main:show_items' item.id %}"><button>Read More</button></a></p>
+</div>
+<hr>
+{% endfor %}
+
+{% endif %}
+
+{% endblock content %}
