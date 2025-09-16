@@ -26,13 +26,13 @@ Terakhir, saya menambahkan 4 fungsi baru pada views.py yaitu untuk mengembalikan
 (6)
 Tidak, semuanya sudah bagus
 
-POSTMAN_XML: ![Postman with an XML response](images/POSTMAN_XML.PNG)
+POSTMAN_XML: ![Postman with an XML response](images/POSTMAN_XML.png)
 
-POSTMAN_JSON: ![Postman with a JSON response](images/POSTMAN_JSON.PNG)
+POSTMAN_JSON: ![Postman with a JSON response](images/POSTMAN_JSON.png)
 
-POSTMAN_XML_BYID: ![Postman with an XML response filtered by ID](images/POSTMAN_XML_BYID.PNG)
+POSTMAN_XML_BYID: ![Postman with an XML response filtered by ID](images/POSTMAN_XML_BYID.png)
 
-POSTMAN_JSON_BYID: ![Postman with a JSON response filtered by ID](images/POSTMAN_JSON_BYID.PNG)
+POSTMAN_JSON_BYID: ![Postman with a JSON response filtered by ID](images/POSTMAN_JSON_BYID.png)
 
 
 
