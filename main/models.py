@@ -1,7 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Item(models.Model):
-
     CATEGORIES = [
         ('jersey', 'Jersey'),
         ('ball', 'Ball'),
@@ -9,6 +9,7 @@ class Item(models.Model):
         ('merch', 'Merchandise'),
         ('gear', 'Gear'),
     ]
+    store = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     price = models.IntegerField()
     description = models.TextField()
