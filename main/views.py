@@ -18,7 +18,7 @@ def show_main(request):
     if filter_type == "all":
         items_list = Item.objects.all()
     else:
-        items_list = Item.objects.filter(status=request.user)
+        items_list = Item.objects.filter(store=request.user)
 
     context = {
         'app_name': 'Kick Off',
@@ -46,6 +46,9 @@ def add_item(request):
     form = ItemForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
+        item_entry = form.save(commit = False)
+        item_entry.store = request.user
+        item_entry.save()
         form.save()
         return redirect('main:show_main')
 
