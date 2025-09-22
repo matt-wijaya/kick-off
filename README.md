@@ -59,10 +59,35 @@ POSTMAN_XML_BYID: ![Postman with an XML response filtered by ID](images/POSTMAN_
 
 POSTMAN_JSON_BYID: ![Postman with a JSON response filtered by ID](images/POSTMAN_JSON_BYID.png)
 
---------------TUGAS 4--------------------
+---
+## Tugas Individu 4
 
+# (1)
+Django AuthenticationForm berguna untuk meningkatkan keamanan dari website dengan menambahkan autentikasi sekaligus mensimplifikasi proses login dari user. Form ini menyediakan dua field secara langsung yaitu username dan password. Dalam Form ini terdapat aspek keamanan yang sudah dikelola secara built-in dari Django sendiri, termasuk bagian utama yaitu memeriksa kredensial pengguna, tanpa perlu konfigurasi tambahan. Selain itu, Autentikasi juga dapat diimplementasika melalui backend dari web sehingga pemberian otorisasi juga dapat dilakukan melalui backend.
 
+Namun, kekurangan yang dimiliki adalah bahwa Form ini masih bersifat sangat mendasar dan terbatas di field username dan password, jika ingin ada opsi lain untuk masuk ke dalam web, maka harus dikonfigurasikan sendiri. 
 
+# (2)
+Perbedaan antara autentikasi dan otorisasi menurut saya bersifat berkelanjutan, autentikasi dilakukan untuk memverifikasi kredensial dari user. Tujuan utamanya adalah untuk memastikan pengguna benar-benar mereka yang memiliki akun dan menolak apabila ada percobaan akses dengan kredensial yang tidak sesuai melampaui batas tertentu. Di sisi lain, otorisasi adalah pemberian akses bagi user yang telah berhasil melalui proses autentikasi sesuai dengan masing-masing role yang mereka miliki. Apakah mereka hanya berperan sebagai viewers atau mereka dapat mengedit konten-konten yang ada di dalam website akan disesuikan di proses otorisasi. Perbedaan hak ases yang dimiliki oleh user yang belum login dan yang sudah login juga dibedakan setelah melalui proses otorisasi.
+
+# (3)
+Cookies dapat meningkatkan user experience dari seorang pengguna web karena menyimpan informasi seperti login credentials dan juga preferensi ketika user kembali mengakses website tersebut melalui penyimpanan di dalam browser. Hal ini memudahkan pembuat website dalam mengetahui apa minat user sehingga tampilan web dapat disesuaikan dengan apa yang disukai oleh user. Selain itu, cookies relatif lebih mudah diakses karena disimpan di browser milik user. 
+
+Kekurangan yang dimiliki cookies adalah bahwa bagaimana data dapat dihapus oleh pengguna dan juga memiliki resiko keamanan apabila digunakan untuk menyimpan data sensitif karena sifatnya yang tidak langsung dibuang ketika browser dimatikan.
+
+Di sisi lain, session adalah data user yang disimpan di server, membuatnya lebih aman dan ideal untuk menyimpan informasi yang sementara atau yang bersifat sensitif. Selain itu, yang membuatnya lebih aman dari cookies juga adalah bahwa session akan diterminate secara otomatis setelah usernya inaktif atau memang diprogram untuk dihancurkan, posisinya yang berada di server juga membuatnya tidak terekspos langsung ke pengguna. Hal ini membuatnya akan sulit untuk digali oleh peretas karena akan langsung hilang dan tidak bertahan di browser seperti informasi yang disimpan di dalam cookies. Kekurangan dari session adalah karena alokasi memorinya yang terpusat di server dan dapat menjadi beban yang menumpuk bagi server apabila aktif dalam jumlah banyak.
+
+# (4)
+Aman apabila juga ada aksi kooperatif dari user, peretasan yang dilakukan melalui informasi yang disimpan di dalam web umumnya dilakukan ketika user mengakses suatu tautan yang dapat langsung mengeksekusi script yang ditetapkan oleh peretas. Selain itu, bisa terjadi manipulasi data yang berada di dalam cookies untuk menredirect informasi dari website agar informasi dikirimkan kepada peretas. 
+
+Penanganan melalui Django dapat dilakukan dengan adanya token CSRF yang dimiliki oleh kedua belah pihak yang berinteraksi yaitu client dan server. Hal ini dapat meminimalisir akses yang tidak terautorisasi apabila CSRF token yang dimiliki tidak sesuai. Selain itu, Django mayoritas menggunakan session dalam implementasinya, dan cookies hanya sebagai perantara berupa ID yang terenkripsi dan sulit diretas, hal ini dapat mencegah terjadinya manipulasi.
+
+# (5)
+Dalamm menyelesaikan tugas ini, pertama saya membuat tiga fungsi view di views.py untuk register, login, dan logout. Fungsi register dibuat menggunakan sistem bawaan Django yaitu UserCreationForm untuk menyimpan user baru. Selain itu, fungsi login akan menggunakan authenticationform untuk memeriksa kredensial dari user. Logout user juga menggunakan sistem bawaan dari Django untuk meng-end session. Setiap fungsi kemudian dipetakan ke urls.py dan template HTML sederhana juga ditambahkan untuk page regis dan login.
+
+Lalu, saya menghubungkan data dengan user dengan memodifikasi models.py. Pada Product saya menambahkan sebauh field store yang melink dengan User. Ini akan memetakan pengguna dengan produk yang mereka tambahkan, kemudian saya lakukan makemigrations dan migrate untuk mengkonfigurasi database. Setelah itu, saya melakukan percobaan pembuatan akun dan penambahan produk oleh masing-masing user.
+
+Terakhir, saya memodifikasi views.py untuk menampilkan last session dan cookie. Saya mengambil informasi pengguna dari request.user dan mendisplaynya melalui template. Saya atur cookie last login session dengan menambahkannya di function login_user setelah berhasil diautentikasi. cookie akan dihapus apabila pengguna logout dari akun milik mereka.
 
 
 
