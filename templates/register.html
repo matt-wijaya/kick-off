@@ -1,32 +1,46 @@
 {% extends 'base.html' %}
 
 {% block meta %}
-<title>Register</title>
+<title>Register - KickOff</title>
 {% endblock meta %}
 
 {% block content %}
+<div class="w-full min-h-screen flex items-center justify-center p-8">
+  <div class="max-w-md w-full">
+    <div class="bg-white rounded-lg border border-[#DEDEDE] p-8 shadow-sm">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-semibold text-[#0A0A0A] mb-2">Join Us</h2>
+        <p class="text-[#333333]/80">Create your KickOff account</p>
+      </div>
 
-<div>
-  <h1>Register</h1>
+      <form method="POST" action="" class="space-y-5">
+        {% csrf_token %}
+        <div>
+          <label for="username" class="block text-sm font-medium text-[#333333] mb-2">Username</label>
+          <input id="username" name="username" type="text" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Choose a username">
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-[#333333] mb-2">Password</label>
+          <input id="password" name="password" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Create a password">
+        </div>
+        <div>
+          <label for="password2" class="block text-sm font-medium text-[#333333] mb-2">Confirm Password</label>
+          <input id="password2" name="password2" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Confirm your password">
+        </div>
+        <button type="submit" class="w-full bg-[#FF3C02] text-white font-medium py-3 px-4 rounded hover:bg-[#FF3C02]/90 transition duration-200">
+          Create Account
+        </button>
+      </form>
 
-  <form method="POST">
-    {% csrf_token %}
-    <table>
-      {{ form.as_table }}
-      <tr>
-        <td></td>
-        <td><input type="submit" name="submit" value="Daftar" /></td>
-      </tr>
-    </table>
-  </form>
-
-  {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+      <div class="mt-6 text-center">
+        <p class="text-[#333333]/80 text-sm">
+          Already have an account? 
+          <a href="{% url 'main:login' %}" class="text-[#FF3C02] hover:text-[#FF3C02]/80 font-medium">
+            Sign In
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
-
 {% endblock content %}

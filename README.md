@@ -89,5 +89,40 @@ Lalu, saya menghubungkan data dengan user dengan memodifikasi models.py. Pada Pr
 
 Terakhir, saya memodifikasi views.py untuk menampilkan last session dan cookie. Saya mengambil informasi pengguna dari request.user dan mendisplaynya melalui template. Saya atur cookie last login session dengan menambahkannya di function login_user setelah berhasil diautentikasi. cookie akan dihapus apabila pengguna logout dari akun milik mereka.
 
+---
+## Tugas Individu 5
 
+# (1)
 
+Ketika sbbuah HTML memiliki beberapa style yang didefinisikan sebagai selector CSS, browser akan memprioritaskannya berdasarkan prioritas tertinggi yang ada, urutannya adalah,
+- Inline : Atribut yang ditulis langsung di dalam tag HTML seperti <h1 ... </h1>
+- ID Selector : Style yang menargetkan sebuah id unik elemen seperti warna dengan hex code tertentu
+- Class : Style yang menargetkan elemen berdasarkan class, state khusus, atau atribut.
+- Element Selector : Style yang menargetkan semua elemen dengan tag HTML yang sama
+- Default browser : Style bawaan browser
+
+# (2)
+Design yang responsive dari web ketika dibuka di berbagai platform adalah bagian dari UX yang menciptakan ketertarikan dari pengguna. Sebelum saya memodifikasi kode, navbar saya memiliki suatu masalah yang terjadi ketika ukuran window dikecilkan adalah bahwa tombol add item menghilang dan tidak dapat diakses. Ketika hal ini terjadi, pengguna dapat meninggalkan website dengan kesan yang buruk karena fitur yang tidak dapat mereka akses, termasuk seperti kesulitan membaca teks, menekan tombol, menavigasi situs, dsb. yang membuat mereka dengan cepat keluar dari situs web tersebut.
+
+# (3)
+
+Margin, Border, dan Padding adalah bagian dari CSS Box Model yang membedakan bagaimana wrapping setiap elemen HTML
+- Padding adalah ruang transparan dalam border, gunanya adalah untuk memberikan jarak antara satu konten dengan konten yang lain untuk mempermudah user dalam membedakan masing-masing elemen dan memiliki experience serta memhami hierarchy dengan lebih baik.
+- Border adalah garis yang mengelilingi padding dan konten, bisa berupa garis biasa, titik-titik, berwarna, dsb.
+- Margin adalah ruang transparan DI LUAR border, sama seperti padding tapi terletak di luar dan biasanya berlaku secara global di satu page untuk menciptakan area yang tidak developer inginkan user untuk ditempati elemen.
+
+# (4)
+
+Flexbox dan Grid adalah dua sistem layout di CSS untuk mengatur elemen di suatu page. 
+- Flexbox adalah flexible box layout, yang digunakan untuk design layout satu dimensi, sebagai row atau collumn. Dengan menggunakan flexbox, jarak antar elemen bisa diseragamkan sehingga terlihat teratur dengan jarak yang sama antara satu dengan yang lainnya. Diimplementaskan dengan display: flex dan digunakan dalam tombol edit dan delete di card item.
+- Grid Layout digunakan untuk layout dua dimensi, mendesign baris dan kolom secara bersamaan membaginya menajdi blok-blok tertentu. Ini ideal untuk penempatan elemen secara umum, baik di home page, gallery atau sebagainya yang mempunyai banyak repetisi, butuh kerapihan, dan cenderung kompleks. Di program ini digunakan dalam mendisplay card_ide. 
+
+# (5)
+
+Untuk mengimplementasikan tugas minggu ini, lebih berfokus ke aspek design dan juga UI dari website itu sendiri. Saya melakukannya dengan mengintegrasi Tailwind CSS pertamanya. Kita memilih Tailwind untuk styling karena adanya berbagai utility yang bisa digunakan untuk mempercepat desain. Tailwind ditambahkan di base.html yang diextend ke semua halaman.
+
+Kemudian, saya mendesain sebuah navbar melalui navbar.html. Navbar saya desain sebagai sidebar vertikal yang terletak di sisi kiri. Saya memastikan sidebar tersebut responsif setelah melakukan pengetesan. Saat di layar besar, sidebarnya bersifat statis di sebelah kiri, dan ketika di layar kecil, sidebarnya dapat dibuka dengan menekan button hamburger yang membuatnya responsif. 
+
+Saya juga melakukan styling di berbagai halaman lain mulai dari main.html. Saya mencoba bereksperimen dengan membuat desing di halaman utama menjadi berbeda dan tidak begitu mirip dengan tutorial. Kemudian, untuk card item , saya juga merancang card tersebut untuk lebih menghighlight harga karena kita berperan sebagai toko. Saya juga menghapus tombol read more dan memindahkannya ke card itu sendiri secara utuh. 
+
+Terakhir, saya mengganti warna elemen-elemen di keseluruhan website dari hijau menjadi merah yang beraksen untuk memberikan keunikan dari website.
