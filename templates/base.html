@@ -7,8 +7,90 @@
     {% block meta %} {% endblock meta %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+    
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script> 
+
   </head>
   <body class="bg-[#F1F1F1] text-[#333333]">
+
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] space-y-3">
+    </div>
+    
     {% block content %} {% endblock content %}
+
+    <script>
+        // 1. Fungsi Global untuk Toast (Pure Vanilla JS)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            let bgColor = 'bg-green-600';
+            if (type === 'error') bgColor = 'bg-red-600';
+            if (type === 'warning') bgColor = 'bg-yellow-600';
+            if (type === 'info') bgColor = 'bg-blue-600';
+            
+            const toastHtml = `
+                <div class="toast-item max-w-xs p-4 text-white ${bgColor} rounded-lg shadow-xl transition-all duration-300 transform translate-x-full opacity-0">
+                    ${message}
+                </div>
+            `;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = toastHtml.trim();
+            const toast = tempDiv.firstChild;
+            
+            container.appendChild(toast);
+            
+            // Animasi masuk
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, 10);
+
+            // Animasi keluar dan hapus
+            setTimeout(() => {
+                toast.classList.remove('translate-x-0', 'opacity-100');
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000); 
+        }
+
+        // 2. Ambil CSRF Token dari cookie (Pure Vanilla JS)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const CSRF_TOKEN = getCookie('csrftoken');
+
+        // 3. Ubah pesan Django (messages) saat reload menjadi Toast (Pure Vanilla JS)
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    let type = 'info';
+                    {% if message.tags == 'success' %} type = 'success'; {% endif %}
+                    {% if message.tags == 'error' %} type = 'error'; {% endif %}
+                    {% if message.tags == 'warning' %} type = 'warning'; {% endif %}
+                    
+                    showToast("{{ message|escapejs }}", type);
+                {% endfor %}
+            {% endif %}
+        });
+
+    </script>
+    
+    {% block script %} 
+    {% endblock script %}
   </body>
 </html>

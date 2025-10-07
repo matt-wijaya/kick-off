@@ -13,23 +13,27 @@
         <p class="text-[#333333]/80">Create your KickOff account</p>
       </div>
 
-      <form method="POST" action="" class="space-y-5">
+      <form id="register-form" method="POST" action="{% url 'main:register' %}" class="space-y-5">
         {% csrf_token %}
         <div>
-          <label for="username" class="block text-sm font-medium text-[#333333] mb-2">Username</label>
-          <input id="username" name="username" type="text" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Choose a username">
+          <label for="id_username" class="block text-sm font-medium text-[#333333] mb-2">Username</label>
+          <input id="id_username" name="username" type="text" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Choose a username">
+          <p id="error-username" class="mt-1 text-sm text-red-600 hidden"></p>
         </div>
         <div>
-          <label for="password" class="block text-sm font-medium text-[#333333] mb-2">Password</label>
-          <input id="password" name="password" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Create a password">
+          <label for="id_password1" class="block text-sm font-medium text-[#333333] mb-2">Password</label>
+          <input id="id_password1" name="password" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Create a password">
+          <p id="error-password" class="mt-1 text-sm text-red-600 hidden"></p>
         </div>
         <div>
-          <label for="password2" class="block text-sm font-medium text-[#333333] mb-2">Confirm Password</label>
-          <input id="password2" name="password2" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Confirm your password">
+          <label for="id_password2" class="block text-sm font-medium text-[#333333] mb-2">Confirm Password</label>
+          <input id="id_password2" name="password2" type="password" required class="w-full px-4 py-3 border border-[#DEDEDE] rounded focus:outline-none focus:border-[#FF3C02] transition duration-200" placeholder="Confirm your password">
+          <p id="error-password2" class="mt-1 text-sm text-red-600 hidden"></p>
         </div>
-        <button type="submit" class="w-full bg-[#FF3C02] text-white font-medium py-3 px-4 rounded hover:bg-[#FF3C02]/90 transition duration-200">
+        <button type="submit" id="register-button" class="w-full bg-[#FF3C02] text-white font-medium py-3 px-4 rounded hover:bg-[#FF3C02]/90 transition duration-200">
           Create Account
         </button>
+        <p id="error-nonfield" class="mt-1 text-sm text-red-600 hidden"></p>
       </form>
 
       <div class="mt-6 text-center">
@@ -44,3 +48,83 @@
   </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+    const registerForm = document.getElementById('register-form');
+    const registerButton = document.getElementById('register-button');
+
+    // Helper untuk membersihkan error (Pure Vanilla JS)
+    function clearFormErrors() {
+        document.querySelectorAll('.text-red-600').forEach(el => {
+            el.classList.add('hidden');
+            el.textContent = '';
+        });
+    }
+
+    // Penanganan Form Register dengan FETCH API
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        clearFormErrors();
+        registerButton.disabled = true;
+        registerButton.textContent = 'Registering...';
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new FormData(this)
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                // Tangani error form validation
+                let errorOccurred = false;
+                if (responseData.errors) {
+                    for (const fieldName in responseData.errors) {
+                        const errorMsg = responseData.errors[fieldName].join(' ');
+                        let targetId = fieldName;
+                        if (fieldName === 'password' || fieldName === 'password1') { 
+                             targetId = 'password'; 
+                        } else if (fieldName === 'password2') {
+                             targetId = 'password2';
+                        } else if (fieldName === '__all__') {
+                             targetId = 'nonfield';
+                        }
+                        
+                        const errorEl = document.getElementById('error-' + targetId);
+                        if(errorEl) {
+                           errorEl.textContent = errorMsg;
+                           errorEl.classList.remove('hidden');
+                           errorOccurred = true;
+                        }
+                    }
+                    if (errorOccurred) {
+                        throw new Error("Registration failed due to validation errors.");
+                    }
+                } else {
+                    throw new Error(responseData.message || "Registration failed due to server error.");
+                }
+            } else {
+                 // Sukses
+                showToast(responseData.message, 'success');
+                // Redirect ke halaman login setelah registrasi sukses
+                setTimeout(() => { window.location.href = "{% url 'main:login' %}"; }, 1000);
+            }
+
+        } catch (error) {
+            // Hanya tampilkan toast jika bukan error validasi field-specific
+            if (!error.message.includes("validation errors")) {
+                 showToast(error.message, 'error');
+            }
+            registerButton.disabled = false;
+            registerButton.textContent = 'Create Account';
+        }
+    });
+</script>
+{% endblock script %}

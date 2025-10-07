@@ -126,3 +126,32 @@ Kemudian, saya mendesain sebuah navbar melalui navbar.html. Navbar saya desain s
 Saya juga melakukan styling di berbagai halaman lain mulai dari main.html. Saya mencoba bereksperimen dengan membuat desing di halaman utama menjadi berbeda dan tidak begitu mirip dengan tutorial. Kemudian, untuk card item , saya juga merancang card tersebut untuk lebih menghighlight harga karena kita berperan sebagai toko. Saya juga menghapus tombol read more dan memindahkannya ke card itu sendiri secara utuh. 
 
 Terakhir, saya mengganti warna elemen-elemen di keseluruhan website dari hijau menjadi merah yang beraksen untuk memberikan keunikan dari website.
+
+---
+## Tugas Individu 6
+
+# (1)
+Perbedaan synchronous dan asynchronous request terletak di bagaimana mereka merespon terhadap suatu request. Synchronous request mencegah browser untuk mengeksekusi kode berikutnya sampai server memberikan respon. Jika request yang dilakukan menghasilkan respon, maka bagian kode selanjutnya akan dieksekusi, dan kita tidak bisa mengirim request baru jika belum mendapatkan jawaban dari request yang sebelumnya. Dalam ajax request, synchronous dibuat dengan async parameter yang diset ke false. Sedangkan, asynchronous request tidak mencegah browser untuk mengeksekusi perintah berikutnya sebelum server merespon. Jadi, browser tidak akan menahan eksekusi kode tapi langsung mengeksekusi kode sampai akhir. Akibat sistemnya tersebut, browser bisa mengirim beberapa request di saat yang bersamaan, parameter yang digunakan adalah async yang diset ke true.
+
+# (2)
+Flow Ajax : User mentrigger suatu aksi -> JavaScript meregister aksi tersebut dan membuat XMLHttpRequest -> Request dikirimakn ke server -> Request diproses di server -> JavaScript menerima respon dan mengupdate webpage
+
+Dalam Django, Ajax request dikirimkan oleh bagian dari frontend ke urls untuk dialirkan juga ke view. Request yang diberikan dapat berupa GET atu POST. Django kemudian memproses requestnya dan melakukan eksekusi operasi yang diinginkan, dan mengirimkan respon (umumnya dalam bentuk JSON). Kemudian, frontend dari web akan menghandle informasi yang dikirimkan tersebut dan memperbaharui website secara dinamis tanpa mereload keseluruhan pagenya.
+
+# (3)
+Peran Ajax dalam Django terletak di sifatnya yang bisa menjadi asynchronous. Di sistem web umumnya saat ini, terdapat beberapa fitur yang membutuhkan berjalan secara asynchronous sehingga interaksi dapat terjadi secara real-time tanpa harus menunggu adanya respon dan mereload page. Ajax memungkinkan sebuah web untuk diperbaharui secara berkala dan asynchronous dengan bertukar sedikit demi sedikit data dengan server di belakang layar. Perbedaannya dengan render pada umumnya terlihat di sifatnya ini. Pada render, kita mengirimkan keseluruhan data setelah suatu block code selesai diproses, kemudian menunggu respon dari server untuk mengembalikan hasil renderan. Di sisi lain, dengan Ajax, kita bisa melakukan update ini secara realtime dan mereload sebagian demi sebagian part dari web yang memungkinkan untuk tidak melakukan reload suatu web secara keseluruhan. Hal ini juga akan mengimprove website dari sisi user experience atau pengalaman penggunanya karena pengguna bisa melihat konsekuensi dari aksi yang mereka lakukan secara langsung tanpa perlu mereload atau menunggu respon dari server.
+
+# (4)
+Ajax dapat menghasilkan ancaman di aspek keamanan karena terdapat beberapa celah yang dapat dimanfaatkan peretas untuk mencari vurnerability dari web kita. Beberapa kelemahan itu meliputi,
+
+Cross Site Scripting, yang terjadi saat pengguna menginject scripts ke respons dari Ajax. Ketika dieksekusi di browser, peretas dapat mengambil informasi sensitif yang dikembalikan dan memberikan mereka akses untuk melakukan hal yang merugikan user. Hal yang dapat dilakukan untuk mengatasi hal ini adalah melakukan validasi input dan men"sanitize" konten sebelum memprosesnya. Selain itu, data yang diberikan oleh user juag dipastikan berupa text, bukan kode yang dapat dieksekusi.
+
+Cross Site Request Forgery, seperti yang sudah dibahas di tugas-tugas sebelumnya adalah ketika peretas mencoba menggunakan browser milik user, yang di mana session terautentikasi dari user masih "menyangkut" di browser tersebut, untuk melakukan hal yang tidak diinginkan dan dapat merugikan user. Dari problem ini, kita bisa menggenerate random token untuk setiap request dan memastikan abhwa request Ajax diberikan dari domain yang sama dengan yang meangkses.
+
+Insecure Direct Object References, yang diakibatkan karena request Ajax melibatkan mengakses resources dari server menggunakan identifier. Jika identifiernya terkuak, maka peretas dapat memanipulasinya untuk memberikan mereka akses. Cara pencegahan yang dapat dilakukan adalah dengan menghindari mengekspos data sensitif melalui respon Ajax (validasi di sisi server) dan memvalidasi siapa yang mengakses suatu resource tertentu. 
+
+# (5)
+
+Ajax dapat mengimprove user experience karena sifatnya yang dapat mengambil, mengirim, dan mengupdate data secara dinamis. Website menjadi lebih responsive dan interaktif tanpa perlu adanya reload page. Ajax digunakan di berbagai jenis website seperti social media, yang memungkinkannya dapat meload page baru dan komen secara dinamis (tanpa reload), aplikasi cuaca, yang memungkinkan untuk mengetahui data cuaca saat ini dan mendisplaynya, e-commerce website (seperti web ini), yang memungkinkannya untuk melakukan filtering, mengupdate keranjang belanja, dan memproses pesanan tanpa reload.
+
+Secara lebih jelas, operasi asynchronous memungkinkan website dapat mengeksekusi perintah tanpa memblock apa yang sedang ditampilkan, memastikan interfacenya tetap responsif saat ada yang sedang dieksekusi di background. Saat web smooth dan responsif, user akan cenderung lebih tertarik untuk tetap berada di dalam web itu, dan juga untuk kembali ke dalam web tersebut. Jika user harus menunggu suatu proses selesai untuk dapat berinteraksi lagi dengan aplikasi, mereka akan cenderung meninggalkan web dengan cepat. Dengan kecil atau tidak adanya gap di mana user harus menunggu, atensi mereka bisa dikelola dan dipertahankan dengan baik karena websitenya terkesan lebih cepat dan juga responsive. 

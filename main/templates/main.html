@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block meta %}
 <title>KickOff</title>
@@ -18,12 +19,18 @@
 
         <div class="relative mt-8">
             <div class="flex border-b-2 border-white/10">
-                <a href="?" class="{% if request.GET.filter == 'all' or not request.GET.filter %} -mb-[2px] bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-x border-t border-white/10 text-[#FF3C02] shadow-[2px_0_0_rgba(0,0,0,0.05)] z-10 {% else %} bg-white/10 text-[#333333]/80 hover:text-[#333333] border-b-0 border-r border-white/10 {% endif %} relative top-0 left-0 px-6 py-3 rounded-t-lg font-medium transition-all duration-200 ease-in-out">
+                <a href="#" onclick="changeFilter('all'); return false;" id="filter-all" class="
+                    -mb-[2px] bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-x border-t border-white/10 text-[#FF3C02] shadow-[2px_0_0_rgba(0,0,0,0.05)] z-10
+                    relative top-0 left-0 px-6 py-3 rounded-t-lg font-medium transition-all duration-200 ease-in-out">
                     All Items
                 </a>
-                <a href="?filter=my" class="{% if request.GET.filter == 'my' %} -mb-[2px] bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-x border-t border-white/10 text-[#FF3C02] shadow-[-2px_0_0_rgba(0,0,0,0.05)] z-10 {% else %} bg-white/10 text-[#333333]/80 hover:text-[#333333] border-b-0 border-l border-white/10 {% endif %} relative top-0 left-0 px-6 py-3 rounded-t-lg font-medium transition-all duration-200 ease-in-out">
+                {% if user.is_authenticated %}
+                <a href="#" onclick="changeFilter('my'); return false;" id="filter-my" class="
+                    bg-white/10 text-[#333333]/80 hover:text-[#333333] border-b-0 border-l border-white/10
+                    relative top-0 left-0 px-6 py-3 rounded-t-lg font-medium transition-all duration-200 ease-in-out">
                     My Items
                 </a>
+                {% endif %}
                 <div class="flex-grow flex items-center justify-end text-sm text-[#333333]/60 pr-4">
                     {% if user.is_authenticated %}
                         Last login: {{ last_login }}
@@ -32,26 +39,453 @@
             </div>
 
             <div class="relative z-0 bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border border-white/10 shadow-xl shadow-black/10 rounded-b-lg rounded-tr-lg p-6 pt-4 -mt-[1px]">
-                {% if not items %}
-                    <div class="rounded-lg p-12 text-center">
-                        <div class="w-32 h-32 mx-auto mb-4">
-                            <img src="{% static 'image/no-item.png' %}" alt="No item available" class="w-full h-full object-contain">
-                        </div>
-                        <h3 class="text-lg font-medium text-[#0A0A0A] mb-2">Ready for Kick-Off?</h3>
-                        <p class="text-[#333333]/80 mb-6">Be the one to kick things off!</p>
-                        <a href="{% url 'main:add_item' %}" class="inline-flex items-center px-4 py-2 bg-[#FF3C02] text-white rounded-md hover:bg-[#FF3C02]/90 transition-colors">
+                
+                <div id="loading-state" class="hidden text-center py-12">
+                    <svg class="animate-spin h-10 w-10 text-[#FF3C02] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-[#333333]/80">Loading items...</p>
+                </div>
+                
+                <div id="error-state" class="hidden text-center py-12 bg-red-50 rounded-lg border border-red-200">
+                    <h3 class="text-xl font-medium text-red-700 mb-2">Error!</h3>
+                    <p id="error-message" class="text-red-600 mb-6">Failed to load items. Please try again later.</p>
+                </div>
+                
+                <div id="empty-state" class="hidden rounded-lg p-12 text-center">
+                    <div class="w-32 h-32 mx-auto mb-4">
+                        <img src="{% static 'image/no-item.png' %}" alt="No item available" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-lg font-medium text-[#0A0A0A] mb-2">Ready for Kick-Off?</h3>
+                    <p class="text-[#333333]/80 mb-6">Be the one to kick things off!</p>
+                    {% if user.is_authenticated %}
+                        <button type="button" onclick="showCreateModal()" class="inline-flex items-center px-4 py-2 bg-[#FF3C02] text-white rounded-md hover:bg-[#FF3C02]/90 transition-colors">
                             Add Item
+                        </button>
+                    {% else %}
+                        <a href="{% url 'main:login' %}" class="inline-flex items-center px-4 py-2 bg-[#FF3C02] text-white rounded-md hover:bg-[#FF3C02]/90 transition-colors">
+                            Login to Add Item
                         </a>
-                    </div>
-                {% else %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {% for item in items %}
-                            {% include 'card_item.html' with item=item %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
+
+                <div id="item-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
             </div>
         </div>
     </div>
 </main>
+
+{% include 'item_crud_modals.html' %}
+
+
 {% endblock content %}
+
+
+{% block script %}
+<script>
+    let currentFilter = 'all'; 
+
+    // Referensi DOM Element (Pure Vanilla JS)
+    const itemListContainer = document.getElementById('item-list-container');
+    const loadingState = document.getElementById('loading-state');
+    const emptyState = document.getElementById('empty-state');
+    const errorState = document.getElementById('error-state');
+    const errorMessageEl = document.getElementById('error-message');
+    const filterAll = document.getElementById('filter-all');
+    const filterMy = document.getElementById('filter-my');
+    const itemForm = document.getElementById('item-form');
+    const itemIdInput = document.getElementById('item-id-input');
+    const modalTitle = document.getElementById('modal-title');
+    const deleteItemId = document.getElementById('delete-item-id');
+    const deleteItemName = document.getElementById('delete-item-name');
+
+
+    // Helper untuk format mata uang
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number).replace('IDR', 'Rp');
+    }
+
+    // Fungsi untuk membuat kartu item dari data JSON
+    function createItemCard(item, is_owner) {
+        const fields = item.fields;
+        
+        // --- SANITASI DATA ---
+        const sanitizedName = DOMPurify.sanitize(fields.name);
+        const sanitizedDescription = DOMPurify.sanitize(fields.description);
+        const sanitizedCategory = DOMPurify.sanitize(fields.category);
+        const sanitizedPrice = formatRupiah(fields.price);
+        const sanitizedStock = DOMPurify.sanitize(fields.stock);
+        
+        // URL untuk halaman detail
+        const detailUrl = `{% url 'main:item_detail' 0 %}`.replace('0', item.pk);
+
+        const thumbnailHtml = fields.thumbnail ? 
+            DOMPurify.sanitize(`<img src="${fields.thumbnail}" alt="${sanitizedName}" class="w-full h-full object-cover">`) : 
+            `<div class="w-full h-full bg-[#E6E6E6] flex items-center justify-center"><span class="text-[#333333]/60">No Image</span></div>`;
+        
+        let actions = '';
+
+        if (is_owner) {
+            actions = `
+                <div class="flex items-center justify-end pt-4 border-t border-[#E6E6E6]">
+                    <div class="flex space-x-2">
+                        <button type="button" onclick="showEditModal(${item.pk})" class="px-3 py-1 border border-[#DEDEDE] rounded-md text-sm font-medium text-[#333333] hover:bg-[#F1F1F1] transition-colors">
+                            Edit
+                        </button>
+                        <button type="button" onclick="showDeleteModal(${item.pk}, '${sanitizedName.replace(/'/g, "\\'")}')" class="px-3 py-1 border border-red-500 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Perhatikan penambahan <a> tag di sini
+        return `
+            <article id="item-${item.pk}" class="bg-white rounded-lg border border-[#DEDEDE] hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                <div class="aspect-[16/9] relative overflow-hidden">
+                    <a href="${detailUrl}">
+                        <div class="absolute top-3 left-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-[#FF3C02] text-white">
+                                ${sanitizedCategory}
+                            </span>
+                        </div>
+                        ${thumbnailHtml}
+                    </a>
+                </div>
+
+                <div class="p-5">
+                    <div class="mb-2">
+                        <h3 class="text-lg font-semibold text-[#0A0A0A] leading-tight mb-1">
+                            <a href="${detailUrl}" class="hover:text-[#FF3C02] transition-colors">
+                                ${sanitizedName}
+                            </a>
+                        </h3>
+                        <p class="text-lg font-bold text-[#FF3C02]">
+                            ${sanitizedPrice}
+                        </p>
+                        <p class="text-sm text-[#333333]/60 mt-1">
+                            ${sanitizedStock} in stock
+                        </p>
+                    </div>
+                    <p class="text-[#333333]/80 text-sm leading-relaxed line-clamp-3 mb-4">
+                        ${sanitizedDescription.substring(0, 100)}...
+                    </p>
+                    ${actions}
+                </div>
+            </article>
+        `;
+    }
+
+    // Show/hide page sections (Pure Vanilla JS)
+    function displayState({ showLoading = false, showEmpty = false, showError = false, showGrid = false }) {
+        loadingState.classList.toggle('hidden', !showLoading);
+        emptyState.classList.toggle('hidden', !showEmpty);
+        errorState.classList.toggle('hidden', !showError);
+        itemListContainer.classList.toggle('hidden', !showGrid);
+        
+        if (showGrid) {
+             itemListContainer.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
+        }
+    }
+
+
+    // Fungsi untuk merender item ke kontainer (Pure Vanilla JS)
+    function renderItems(items) {
+        itemListContainer.innerHTML = ''; 
+        
+        displayState({ showGrid: items.length > 0, showEmpty: items.length === 0 });
+
+        if (items.length > 0) {
+            const isOwner = currentFilter === 'my'; 
+            items.forEach(item => {
+                itemListContainer.insertAdjacentHTML('beforeend', createItemCard(item, isOwner));
+            });
+        }
+    }
+
+    // Fungsi untuk memperbarui tampilan filter (Pure Vanilla JS)
+    function updateFilterAppearance() {
+        const activeClass = '-mb-[2px] bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-x border-t border-white/10 text-[#FF3C02] shadow-[2px_0_0_rgba(0,0,0,0.05)] z-10';
+        const inactiveClass = 'bg-white/10 text-[#333333]/80 hover:text-[#333333] border-b-0 border-l border-white/10';
+
+        // Fungsi toggle untuk menghapus/menambahkan class dengan bersih
+        function toggleClasses(element, addClass, removeClass) {
+            if (!element) return;
+            removeClass.split(' ').forEach(cls => element.classList.remove(cls));
+            addClass.split(' ').forEach(cls => element.classList.add(cls));
+        }
+
+        if (filterAll) {
+             if (currentFilter === 'all') {
+                toggleClasses(filterAll, activeClass, inactiveClass);
+             } else {
+                toggleClasses(filterAll, inactiveClass, activeClass);
+             }
+        }
+        
+        if (filterMy) {
+             if (currentFilter === 'my') {
+                toggleClasses(filterMy, activeClass, inactiveClass);
+             } else {
+                toggleClasses(filterMy, inactiveClass, activeClass);
+             }
+        }
+    }
+
+    // FUNGSI UTAMA: Mengambil item list dari server (FETCH API GET)
+    async function refreshItems(filter = 'all') {
+        currentFilter = filter;
+        itemListContainer.innerHTML = '';
+        displayState({ showLoading: true });
+        updateFilterAppearance();
+        
+        const url = `{% url 'main:get_items_json' %}?filter=${filter}`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            displayState({}); 
+            renderItems(data);
+            showToast("Daftar item berhasil diperbarui.", 'info');
+
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            displayState({ showError: true });
+            errorMessageEl.textContent = `Error mengambil daftar item: ${error.message}`;
+            showToast("Gagal memuat item.", 'error');
+        }
+    }
+    
+    // Panggil refreshItems saat filter berubah
+    function changeFilter(filter) {
+        if (filter === 'my' && !'{{ user.is_authenticated }}') {
+             showToast("Anda harus login untuk melihat item Anda.", 'warning');
+             return;
+        }
+        refreshItems(filter);
+    }
+    
+    // Panggilan awal saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshItems(currentFilter);
+        
+        // Tangani Submit Form Modal
+        if (itemForm) {
+            itemForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitItemForm();
+            });
+        }
+    });
+
+    // ===================================
+    // FUNGSI MODAL DAN CRUD FETCH API
+    // ===================================
+    
+    // Tampilkan modal (Pure Vanilla JS)
+    function showModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+             modal.classList.remove('hidden');
+             modal.classList.add('flex');
+        }
+    }
+
+    // Sembunyikan modal (Pure Vanilla JS)
+    function hideModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+             modal.classList.remove('flex');
+             modal.classList.add('hidden');
+             document.querySelectorAll('.text-red-600').forEach(el => {
+                el.classList.add('hidden');
+                el.textContent = '';
+             }); 
+        }
+    }
+    
+    // Tutup modal jika mengklik di luar area modal (Pure Vanilla JS)
+    function closeModal(event, id) {
+        if (event.target.id === id) {
+            hideModal(id);
+        }
+    }
+
+    // Tampilkan modal Create Item
+    function showCreateModal() {
+        if (!'{{ user.is_authenticated }}') return;
+        
+        itemForm.reset(); 
+        itemIdInput.value = ''; 
+        modalTitle.textContent = 'Create New Item';
+        hideModal('delete-modal'); 
+        showModal('item-modal');
+    }
+
+    // Tampilkan modal Edit Item (FETCH API GET)
+    async function showEditModal(itemId) {
+        if (!'{{ user.is_authenticated }}') return;
+
+        const url = `/json/${itemId}/`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            if (!response.ok) {
+                 throw new Error("Gagal mengambil detail item.");
+            }
+            
+            const data = await response.json();
+            const item = data[0].fields;
+            
+            // Isi formulir (Pure Vanilla JS)
+            itemIdInput.value = data[0].pk;
+            modalTitle.textContent = 'Update Item: ' + DOMPurify.sanitize(item.name);
+            document.getElementById('id_name').value = item.name;
+            document.getElementById('id_price').value = item.price;
+            document.getElementById('id_description').value = item.description;
+            document.getElementById('id_thumbnail').value = item.thumbnail;
+            document.getElementById('id_category').value = item.category;
+            document.getElementById('id_is_featured').checked = item.is_featured;
+            document.getElementById('id_stock').value = item.stock;
+            
+            hideModal('delete-modal');
+            showModal('item-modal');
+
+        } catch(error) {
+             showToast(error.message, 'error');
+        }
+    }
+    
+// Submit form (Create/Update) (FETCH API POST)
+async function submitItemForm() {
+    const itemId = itemIdInput.value;
+    const isUpdate = !!itemId;
+    
+    // Ambil nilai form
+    const formData = new FormData(itemForm);
+    
+    // Kumpulkan data dalam bentuk objek JSON
+    const itemData = {
+        name: formData.get('name'),
+        price: parseInt(formData.get('price') || 0),
+        description: formData.get('description'),
+        thumbnail: formData.get('thumbnail'),
+        category: formData.get('category'),
+        is_featured: formData.get('is_featured') === 'on',
+        stock: parseInt(formData.get('stock') || 0)
+    };
+    
+    const url = isUpdate 
+        ? `{% url 'main:update_item_ajax' 0 %}`.replace('0', itemId) 
+        : "{% url 'main:create_item_ajax' %}";
+    const successMessage = isUpdate ? "Item successfully updated!" : "Item successfully added!";
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(itemData)
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            // Handle form validation errors from the server
+            let errorMessage = responseData.message || "Action failed.";
+            
+            if (responseData.errors) {
+                for (const fieldName in responseData.errors) {
+                   const errorMsg = responseData.errors[fieldName].join(' ');
+                   const fieldErrorEl = document.getElementById('error-' + fieldName);
+                   if(fieldErrorEl) {
+                       fieldErrorEl.textContent = errorMsg;
+                       fieldErrorEl.classList.remove('hidden');
+                   }
+                }
+                errorMessage = "Validation failed. Please check the fields above.";
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        hideModal('item-modal');
+        showToast(successMessage, 'success');
+        refreshItems(currentFilter);
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshItems(currentFilter);
+    
+            // Handle Submit Form Modal
+            if (itemForm) {
+                itemForm.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Prevent the default page reload
+                    submitItemForm();   // Call our new function
+                });
+            }
+        });
+
+    } catch (error) {
+        showToast("Action failed: " + error.message, 'error');
+    }
+}
+    
+    // Tampilkan modal Konfirmasi Delete
+    function showDeleteModal(itemId, itemName) {
+        if (!'{{ user.is_authenticated }}') return;
+        deleteItemId.value = itemId;
+        deleteItemName.textContent = itemName;
+        hideModal('item-modal'); 
+        showModal('delete-modal');
+    }
+    
+    // Aksi Delete Final (FETCH API POST)
+    async function deleteItemFinal() {
+        const itemId = deleteItemId.value;
+        const url = `{% url 'main:delete_item_ajax' 0 %}`.replace('0', itemId);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw new Error(responseData.message || "Gagal menghapus item.");
+            }
+
+            hideModal('delete-modal');
+            showToast(responseData.message, 'success');
+            refreshItems(currentFilter);
+
+        } catch (error) {
+            showToast("Gagal menghapus item: " + error.message, 'error');
+        }
+    }
+    
+</script>
+{% endblock script %}

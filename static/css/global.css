@@ -45,3 +45,22 @@
     border-color: #16a34a;
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
+
+.form-style form input,
+.form-style form textarea,
+.form-style form select {
+    width: 100%;
+    padding: 0.75rem; /* A bit more padding for a better look */
+    border: 1px solid #DEDEDE; /* A subtle grey border */
+    border-radius: 0.375rem; /* Rounded corners */
+    transition: all 0.2s ease-in-out; /* Smooth transition for the focus effect */
+}
+
+/* This part adds the red highlight on click */
+.form-style form input:focus,
+.form-style form textarea:focus,
+.form-style form select:focus {
+    outline: none;
+    border-color: #FF3C02;
+    box-shadow: 0 0 0 3px rgba(255, 60, 2, 0.2); /* A soft red glow */
+}
